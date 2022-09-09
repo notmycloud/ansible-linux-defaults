@@ -1,0 +1,43 @@
+---
+- name: Setup default {{ default_shell | default(shell) }} settings
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+      - shell/{{ default_shell | default(shell) }}.yaml
+      skip: True
+
+- name: Create Bash Function | yum
+  blockinfile:
+    path: "/etc/profile.d/01-ansible-function-yum.sh"
+    create: yes
+    mode: 0644
+    block: |
+      yum () {
+        if ! command -v yum &> /dev/null; then
+          echo "yum not be found, are you on RedHat?"
+          return
+        fi
+        if [[ $(id -u) -ne 0 ]]; then
+          command sudo yum "$@"
+        else
+          command yum "$@"
+        fi
+      }
+
+- name: Create Bash Function | dnf
+  blockinfile:
+    path: "/etc/profile.d/01-ansible-function-dnf.sh"
+    create: yes
+    mode: 0644
+    block: |
+      dnf () {
+        if ! command -v dnf &> /dev/null; then
+          echo "dnf not be found, are you on RedHat?"
+          return
+        fi
+        if [[ $(id -u) -ne 0 ]]; then
+          command sudo dnf "$@"
+        else
+          command dnf "$@"
+        fi
+      }

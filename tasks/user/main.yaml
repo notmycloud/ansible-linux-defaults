@@ -1,0 +1,17 @@
+---
+- name: Read remote host Machine-ID to use as SALT
+  ansible.builtin.slurp:
+    src: /etc/machine-id
+  register: machine_id
+
+- name: Setup the root user
+  ansible.builtin.include_tasks: "user/root.yaml"
+
+- name: Setup additional users
+  ansible.builtin.include_tasks: "user/standard.yaml"
+  vars:
+    - user: "{{ loop_user }}"
+  loop: "{{ global_users + host_users }}"
+  loop_control:
+    loop_var: loop_user
+  when: host_users is defined

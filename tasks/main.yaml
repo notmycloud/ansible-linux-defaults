@@ -1,0 +1,52 @@
+---
+- name: Include OS-specific variables.
+  ansible.builtin.include_vars: "{{ ansible_os_family | lower }}.yaml"
+
+- name: Configure SSH
+  ansible.builtin.include_tasks: ssh.yaml
+
+- name: Common setup options for this specific OS
+  include_tasks: "{{ lookup('first_found', files) }}"
+  vars:
+    files:
+      - "os/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+      - "os/{{ ansible_distribution | lower }}.yaml"
+      - "os/{{ ansible_os_family | lower }}.yaml"
+
+- name: Install common packages
+  include_tasks: "{{ lookup('first_found', files) }}"
+  vars:
+    files:
+      - "packages/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+      - "packages/{{ ansible_distribution | lower }}.yaml"
+      - "packages/{{ ansible_os_family | lower }}.yaml"
+
+- name: Set timezone to America/Chicago
+  ansible.builtin.timezone:
+    name: America/Chicago
+  when: "{{ ansible_os_family | lower }} != 'alpine'"
+
+- name: Set timezone to America/Chicago
+  copy:
+    remote_src: yes
+    src: /usr/share/zoneinfo/America/Chicago
+    dest: /etc/localtime
+  when: "{{ ansible_os_family | lower }} == 'alpine'"
+
+- name: Setup the default shell
+  include_tasks: "{{ lookup('first_found', files) }}"
+  vars:
+    files:
+      - "shell/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+      - "shell/{{ ansible_distribution | lower }}.yaml"
+      - "shell/{{ ansible_os_family | lower }}.yaml"
+      - "shell/{{ default_shell | default(shell) }}.yaml"
+
+- name: Setup system users
+  include_tasks: user/main.yaml
+
+# TODO: Logwatch
+# TODO: robertdebock.auditd (Debian & RedHat)
+# TODO: NFTables
+# TODO: SMTP Relay (Postfix to send logs and alerts)
+# TODO: Fail2Ban

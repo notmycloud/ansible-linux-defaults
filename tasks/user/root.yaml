@@ -1,0 +1,27 @@
+---
+- name: Change Root password
+  ansible.builtin.user:
+    name: root
+    password: "{{ ansible_default_root_pass | password_hash('sha512', machine_id['content'] | b64decode) }}"
+
+- name: Create a Root .ssh directory if it does not exist
+  ansible.builtin.file:
+    path: /root/.ssh
+    state: directory
+    mode: '0700'
+
+- name: Generate SSH key for Root
+  ansible.builtin.openssh_keypair:
+    path: "/root/.ssh/id_{{ keytype }}"
+    type: "{{ keytype }}"
+    state: present
+    owner: root
+    group: root
+    force: false
+  loop:
+    - "rsa"
+    - "dsa"
+    - "ecdsa"
+    - "ed25519"
+  loop_control:
+    loop_var: keytype

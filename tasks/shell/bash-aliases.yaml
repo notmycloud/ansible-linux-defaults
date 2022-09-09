@@ -1,0 +1,11 @@
+---
+- name: Add Shell Aliases
+  ansible.builtin.lineinfile:
+    dest: "/etc/profile.d/00-ansible-shell-aliases.sh"
+    create: true
+    mode: 0644
+    line: 'alias {{ alias.name }}="{{ alias.command }}"'
+    regexp: "^alias {{ alias.name }}="
+  loop: "{{ default_shell_aliases }}"
+  loop_control:
+    loop_var: alias

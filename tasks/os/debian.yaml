@@ -1,0 +1,29 @@
+---
+- name: Confiugre APT Extraction tmpfs
+  ansible.builtin.blockinfile:
+    path: /etc/apt/apt.conf.d/01-tempdir
+    create: true
+    mode: '0644'
+    block: |
+      APT::ExtractTemplates::TempDir "/var/cache/apt-tmpfs";
+      DPkg {
+        Pre-Invoke  { "mkdir -p /var/cache/apt-tmpfs && mount -t tmpfs tmpfs /var/cache/apt-tmpfs" };
+        Post-Invoke { "umount /var/cache/apt-tmpfs" };
+      };
+
+- name: Update APT package cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: setup tmpreaper
+  include_role: 
+    name: ANXS.tmpreaper
+  vars:
+    tmpreaper_time:	'7d'	
+    tmpreaper_dirs: /tmp/. /var/tmp/.	
+    tmpreaper_delay:	'256'	
+    tmpreaper_protect_extra: /tmp/*.sock /tmp/hsperfdata_*
+    tmpreaper_additional_options: --all
+    tmpreaper_cron_hour: '2'
+    tmpreaper_cron_minute: '1'
