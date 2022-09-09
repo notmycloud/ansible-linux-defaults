@@ -20,9 +20,9 @@
   include_role: 
     name: ANXS.tmpreaper
   vars:
-    tmpreaper_time:	'7d'	
-    tmpreaper_dirs: /tmp/. /var/tmp/.	
-    tmpreaper_delay:	'256'	
+    tmpreaper_time: '7d'
+    tmpreaper_dirs: /tmp/. /var/tmp/.
+    tmpreaper_delay: '256'
     tmpreaper_protect_extra: /tmp/*.sock /tmp/hsperfdata_*
     tmpreaper_additional_options: --all
     tmpreaper_cron_hour: '2'
