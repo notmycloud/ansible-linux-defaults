@@ -1,11 +1,7 @@
 ---
 - name: Check SSH Connection
   ansible.builtin.include_role: 
-    name: notmycloud.ssh_port
-  vars:
-    ssh:
-      host: "{{ inventory_hostname }}"
-      port: "{{ ansible_port }}"
+    name: notmycloud.ssh_port_fingerprint
 
 # Fix issue with SSH not working on reboot
 # https://askubuntu.com/questions/1109934/ssh-server-stops-working-after-reboot-caused-by-missing-var-run-sshd
