@@ -1,3 +1,5 @@
+# This repository is archived in favor of notmycloud/ansible-linux_defaults (Yes, a rename and a rewrite).
+
 # ansible-linux-defaults
 Highly opinionated defaults for Linux systems.
 
